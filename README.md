@@ -62,6 +62,12 @@ https://github.com/admc/wd
 https://github.com/admc/wd/blob/master/doc/api.md
 https://github.com/cucumber/cucumber-js
 
+
+Please define a step:
+"Then username and password should validate" Using other step definitions
+Please define another step which need not comprise of other step definitions:
+"Then the max allowed characters in the field "{Field}" should be "{Char}""
+
 Please put your feature files in source/features and answer the following questions.
 
 ```
@@ -69,6 +75,7 @@ Please put your feature files in source/features and answer the following questi
   2) Create three (3) "positive paths" the lead to a successful "sign up".
   3) List all possible error messages for all required fields.
   4) What possible user interface considerations can be added?
+
 ```
 5. Submission
 ---------------
@@ -176,6 +183,115 @@ Then the "{field}" field should exist
 Then the "{field}" field should not exist
 
 ```
+
+How to define new steps
+Since we must follow the rule that a step must map to only one function, we have to define a map-steps.js file that will be imported into our steps.js file as shown here:
+/**
+ * step_definitions/steps.js
+ * Notice that we are still importing map-steps that we use to define our regular steps.
+ **/
+var mapSteps = require('../support/map-steps.js');
+
+/** 
+ * When we import our steps into our Gherkin project,
+ * we need to return a class function that initializes
+ * the correct world object.
+ **/
+module.exports = function(world) {
+  return new function() {
+    this.World = world;
+
+    this.Given(/^Example: I go to homepage check the title to be "([^"]*)" and check the url to be "([^"]*)"?/, function(title, url, callback) {
+      mapSteps.example(title, url, callback, this);
+    });
+
+    this.Given(/^Example: Some pending example step?/, function(callback) {
+      mapSteps.pendingExample();
+    });
+  };
+};
+Bellow we have our map-steps.js that contains the functions we map to:
+/**
+ * Notice that we are importing our map steps
+ * from devops-cucumber-defaults. This will allow
+ * us to use primitive steps to define our newly
+ * defined step.
+ *
+ * We use Chain to then synchronize our step actions properly.
+ **/
+var DefaultMapSteps = require('devops-cucumber-defaults').DefaultMapSteps;
+var Chain = require('devops-cucumber-defaults').Chain;
+
+MapSteps = function () {
+  var mapSteps = this;
+
+  /**
+   * Since all custom steps are comprised of primitive
+   * steps found in cucumber-defaults, we need to use Chain()
+   * to call these steps. If there is a primitive step that needs
+   * to be added, it should be added to cucumber-defaults.
+   *
+   * Please checkout the comments in Chain.js found in the
+   * cucumber-defaults repo for documentation. I will
+   * at some point create a read me for how to use Chain.
+   **/
+  this.example = function(title, url, callback, self) {
+    Chain([
+      ['cb', self, DefaultMapSteps.iGoToHomepage],
+      [title, 'title', 'cb', false, self, DefaultMapSteps.elementContains],
+      [url, callback, self, DefaultMapSteps.shouldBeOn]
+    ]);
+  };
+
+  this.pendingExample = function(callback, self) {
+    callback.pending();
+  };
+};
+
+module.exports = new MapSteps;
+Chain.js and the use of Chain()
+Chain.js is found in the cucumber-defaults repo and is automatically included through the devops-cucumber-defaults file.
+This helper function takes in an array of arguments that chains Gherkin step definitions properly to synchronize step calls.
+When calling a step in the chain, you will need to specify the position of the arguments where the callback should be passed. Take for example:
+DefaultMapSteps.iGoToHomepage(function() {
+  DefaultMapSteps.iFollow('Edit', callback, self);
+}, self);
+The array argument you must pass is then:
+Chain([
+  ['cb', self, DefaultMapSteps.iGoToHomepage],
+  ['Edit', callback, self, DefaultMapSteps.iFollow]
+]);
+Chain will then automatically execute in order:
+1) DefaultMapSteps.iGoToHomepage
+2) DefaultMapSteps.iFollow
+In the first array argument: ['cb', self, DefaultMapSteps.iGoToHomepage]
+'cb' is a reserved key word used by chain to locate where the callback, DefaultMapSteps.iFollow needs to be sent. Essentially it will perform the following operation:
+// 'cb' is replaced by the correct callback
+DefaultMapSteps.iGoToHomepage( DefaultMapSteps.iFollow, self );
+***** Important note ******** If you have preceding arguments your are passing into chain's argument array, you must specify a 'cb' callback. Example:
+// Wrong **** No 'cb' is declared
+Chain([
+  [function() {}, self, DefaultMapSteps.iGoToHomepage],
+  ['Edit', callback, self, DefaultMapSteps.iFollow]
+])
+
+// Right 'cb' is declared
+Chain([
+  ['cb', self, DefaultMapSteps.iGoToHomepage],
+  ['Edit', callback, self, DefaultMapSteps.iFollow]
+])
+
+// Right: There is no reason to declare 'cb'
+// since you are not passing in a callback
+Chain([
+  [function() {}, self, DefaultMapSteps.iGoToHomepage]
+])
+
+
+
+
+
+
 
 Confidentiality Notice
 ======================
