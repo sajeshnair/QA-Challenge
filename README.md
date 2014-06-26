@@ -217,6 +217,8 @@ module.exports = function(world) {
 ```
 
 Bellow we have our map-steps.js that contains the functions we map to:
+
+```
 /**
  * Notice that we are importing our map steps
  * from devops-cucumber-defaults. This will allow
@@ -257,6 +259,7 @@ MapSteps = function () {
 module.exports = new MapSteps;
 
 ```
+
 Chain.js and the use of Chain()
 ===============================
 
@@ -269,7 +272,9 @@ When calling a step in the chain, you will need to specify the position of the a
 DefaultMapSteps.iGoToHomepage(function() {
   DefaultMapSteps.iFollow('Edit', callback, self);
 }, self);
+```
 The array argument you must pass is then:
+```
 Chain([
   ['cb', self, DefaultMapSteps.iGoToHomepage],
   ['Edit', callback, self, DefaultMapSteps.iFollow]
@@ -277,17 +282,21 @@ Chain([
 
 ```
 Chain will then automatically execute in order:
-===============================================
+
+```
 1) DefaultMapSteps.iGoToHomepage
 2) DefaultMapSteps.iFollow
 
+```
 In the first array argument: ['cb', self, DefaultMapSteps.iGoToHomepage]
 'cb' is a reserved key word used by chain to locate where the callback, DefaultMapSteps.iFollow needs to be sent. Essentially it will perform the following operation:
+```
 // 'cb' is replaced by the correct callback
 DefaultMapSteps.iGoToHomepage( DefaultMapSteps.iFollow, self );
-
 ```
+
 ***** Important note ******** If you have preceding arguments your are passing into chain's argument array, you must specify a 'cb' callback. Example:
+```
 // Wrong **** No 'cb' is declared
 Chain([
   [function() {}, self, DefaultMapSteps.iGoToHomepage],
@@ -305,7 +314,7 @@ Chain([
 Chain([
   [function() {}, self, DefaultMapSteps.iGoToHomepage]
 ])
-
+```
 
 
 
