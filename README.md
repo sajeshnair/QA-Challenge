@@ -185,6 +185,9 @@ Then the "{field}" field should not exist
 ```
 
 How to define new steps
+=========================
+
+```
 Since we must follow the rule that a step must map to only one function, we have to define a map-steps.js file that will be imported into our steps.js file as shown here:
 /**
  * step_definitions/steps.js
@@ -210,6 +213,9 @@ module.exports = function(world) {
     });
   };
 };
+
+```
+
 Bellow we have our map-steps.js that contains the functions we map to:
 /**
  * Notice that we are importing our map steps
@@ -249,10 +255,17 @@ MapSteps = function () {
 };
 
 module.exports = new MapSteps;
+
+```
 Chain.js and the use of Chain()
+===============================
+
 Chain.js is found in the cucumber-defaults repo and is automatically included through the devops-cucumber-defaults file.
 This helper function takes in an array of arguments that chains Gherkin step definitions properly to synchronize step calls.
+
 When calling a step in the chain, you will need to specify the position of the arguments where the callback should be passed. Take for example:
+
+```
 DefaultMapSteps.iGoToHomepage(function() {
   DefaultMapSteps.iFollow('Edit', callback, self);
 }, self);
@@ -261,13 +274,19 @@ Chain([
   ['cb', self, DefaultMapSteps.iGoToHomepage],
   ['Edit', callback, self, DefaultMapSteps.iFollow]
 ]);
+
+```
 Chain will then automatically execute in order:
+===============================================
 1) DefaultMapSteps.iGoToHomepage
 2) DefaultMapSteps.iFollow
+
 In the first array argument: ['cb', self, DefaultMapSteps.iGoToHomepage]
 'cb' is a reserved key word used by chain to locate where the callback, DefaultMapSteps.iFollow needs to be sent. Essentially it will perform the following operation:
 // 'cb' is replaced by the correct callback
 DefaultMapSteps.iGoToHomepage( DefaultMapSteps.iFollow, self );
+
+```
 ***** Important note ******** If you have preceding arguments your are passing into chain's argument array, you must specify a 'cb' callback. Example:
 // Wrong **** No 'cb' is declared
 Chain([
