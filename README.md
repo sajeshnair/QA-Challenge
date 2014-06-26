@@ -63,10 +63,14 @@ https://github.com/admc/wd/blob/master/doc/api.md
 https://github.com/cucumber/cucumber-js
 
 
-Please define a step:
-"Then username and password should validate" Using other step definitions
+Please define a step using other step definitions:
+```
+"Then username and password should validate"
+```
 Please define another step which need not comprise of other step definitions:
+```
 "Then the max allowed characters in the field "{Field}" should be "{Char}""
+```
 
 Please put your feature files in source/features and answer the following questions.
 
@@ -75,7 +79,6 @@ Please put your feature files in source/features and answer the following questi
   2) Create three (3) "positive paths" the lead to a successful "sign up".
   3) List all possible error messages for all required fields.
   4) What possible user interface considerations can be added?
-
 ```
 5. Submission
 ---------------
@@ -315,11 +318,6 @@ Chain([
   [function() {}, self, DefaultMapSteps.iGoToHomepage]
 ])
 ```
-
-
-
-
-
 
 Confidentiality Notice
 ======================
